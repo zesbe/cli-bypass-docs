@@ -1497,7 +1497,7 @@ case $choice in
                 export ANTHROPIC_API_KEY="$GEMINI_API_KEY"
                 
                 echo -e "${BLUE}🚀 Starting Gemini...${NC}"
-                exec claude --no-chrome --model "gemini-2.0-flash-exp" "$@"
+                exec claude --dangerously-skip-permissions --no-chrome --model "gemini-2.0-flash-exp" "$@"
                 ;;
             2)
                 # CCS OAuth method
@@ -1522,7 +1522,7 @@ case $choice in
                 export ANTHROPIC_API_KEY="$PROXY_KEY"
                 
                 echo -e "${BLUE}🚀 Starting dengan custom proxy...${NC}"
-                exec claude --no-chrome "$@"
+                exec claude --dangerously-skip-permissions --no-chrome "$@"
                 ;;
             *)
                 echo "Kembali ke menu..."
@@ -2049,8 +2049,27 @@ EOF
         exec claude --dangerously-skip-permissions --model "$MODEL_NAME" "$@"
         ;;
     17)
-        # Letta AI - Memory-Augmented Agent (Quick Select)
+        # Letta AI - Official Letta Platform API (Memory-Augmented Agents)
         echo -e "${BLUE}🧠 Letta Memory Agent${NC}"
+        echo -e "${CYAN}   Platform: https://letta.com${NC}"
+        echo ""
+
+        # Get Letta API key
+        if [[ -z "$LETTA_API_KEY" ]]; then
+            echo -e "${YELLOW}Letta API Key required${NC}"
+            echo "Get your free API key at: https://letta.com"
+            echo "Free tier: 5,000 credits/month"
+            echo ""
+            read -sp "Enter Letta API Key: " LETTA_KEY_TEMP
+            echo ""
+            [[ -z "$LETTA_KEY_TEMP" ]] && { echo -e "${RED}API Key required!${NC}"; exit 1; }
+
+            # Save to file for future use
+            echo "$LETTA_KEY_TEMP" > "$HOME/.letta_api_key"
+            chmod 600 "$HOME/.letta_api_key"
+            export LETTA_API_KEY="$LETTA_KEY_TEMP"
+        fi
+
         echo ""
         echo "Pilih Model:"
         echo "  1) Opus    🔬 Most Powerful - Complex reasoning"
@@ -2062,43 +2081,35 @@ EOF
         read -p "Pilih [1-5, default: 2]: " model_choice
         [[ -z "$model_choice" ]] && model_choice=2
 
+        # Configure Letta API
+        export ANTHROPIC_API_KEY="$LETTA_API_KEY"
+        export ANTHROPIC_BASE_URL="https://api.letta.com/v1/anthropic"
+
         system_prompt="You are Letta, a memory-augmented AI agent with persistent memory capabilities. You maintain context across conversations, remember user preferences, and build long-term knowledge. Key features: (1) Long-term memory, (2) Context awareness, (3) Personalization. Always identify yourself as Letta when asked."
 
         case $model_choice in
             1)
-                echo -e "${GREEN}✓ Model: Claude Opus${NC}"
-                echo -e "${BLUE}🚀 Starting Letta...${NC}"
-                exec claude --no-chrome --model "opus" --system-prompt "$system_prompt"
+                echo -e "${GREEN}✓ Model: Claude Opus (Letta)${NC}"
+                echo -e "${BLUE}🚀 Starting Letta Agent...${NC}"
+                exec claude --dangerously-skip-permissions --no-chrome --model "claude-opus-4-20250514" --system-prompt "$system_prompt"
                 ;;
             3)
-                echo -e "${GREEN}✓ Model: Claude Haiku${NC}"
-                echo -e "${BLUE}🚀 Starting Letta...${NC}"
-                exec claude --no-chrome --model "haiku" --system-prompt "$system_prompt"
+                echo -e "${GREEN}✓ Model: Claude Haiku (Letta)${NC}"
+                echo -e "${BLUE}🚀 Starting Letta Agent...${NC}"
+                exec claude --dangerously-skip-permissions --no-chrome --model "claude-haiku-4-20250514" --system-prompt "$system_prompt"
                 ;;
             4)
-                echo -e "${GREEN}✓ Model: GPT-4o${NC}"
-                # Configure OpenAI
-                get_api_key_with_save "OPENAI_API_KEY" "$HOME/.openai_api_key" "OpenAI" "https://platform.openai.com/api-keys"
-                export ANTHROPIC_API_KEY="$OPENAI_API_KEY"
-                export ANTHROPIC_BASE_URL="https://api.openai.com/v1"
-                
-                echo -e "${BLUE}🚀 Starting Letta with GPT-4o...${NC}"
-                exec claude --no-chrome --model "gpt-4o" --system-prompt "$system_prompt"
+                echo -e "${GREEN}✓ Model: GPT-4o (Letta)${NC}"
+                exec claude --dangerously-skip-permissions --no-chrome --model "gpt-4o" --system-prompt "$system_prompt"
                 ;;
             5)
-                echo -e "${GREEN}✓ Model: Gemini 2.0 Flash${NC}"
-                # Configure Gemini
-                get_api_key_with_save "GEMINI_API_KEY" "$HOME/.gemini_api_key" "Gemini" "https://aistudio.google.com/app/apikey"
-                export ANTHROPIC_API_KEY="$GEMINI_API_KEY"
-                export ANTHROPIC_BASE_URL="https://generativelanguage.googleapis.com/v1beta/anthropic"
-                
-                echo -e "${BLUE}🚀 Starting Letta with Gemini...${NC}"
-                exec claude --no-chrome --model "gemini-2.0-flash-exp" --system-prompt "$system_prompt"
+                echo -e "${GREEN}✓ Model: Gemini 2.0 Flash (Letta)${NC}"
+                exec claude --dangerously-skip-permissions --no-chrome --model "gemini-2.0-flash-exp" --system-prompt "$system_prompt"
                 ;;
             2|*)
-                echo -e "${GREEN}✓ Model: Claude Sonnet${NC}"
-                echo -e "${BLUE}🚀 Starting Letta...${NC}"
-                exec claude --no-chrome --model "sonnet" --system-prompt "$system_prompt"
+                echo -e "${GREEN}✓ Model: Claude Sonnet (Letta)${NC}"
+                echo -e "${BLUE}🚀 Starting Letta Agent...${NC}"
+                exec claude --dangerously-skip-permissions --no-chrome --model "claude-sonnet-4-20250514" --system-prompt "$system_prompt"
                 ;;
         esac
         ;;
