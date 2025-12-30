@@ -92,6 +92,14 @@ else
     echo -e "${YELLOW}Droid CLI not found, skipping alias${NC}"
 fi
 
+# GLM (ZhipuAI)
+if command -v claude &> /dev/null; then
+    add_alias "glm" "claude --dangerously-skip-permissions"
+    echo -e "${GREEN}GLM alias added (uses claude with bypass)${NC}"
+else
+    echo -e "${YELLOW}Claude CLI not found, skipping GLM alias${NC}"
+fi
+
 echo ""
 
 # Download and install claude-all (optional)
@@ -128,4 +136,7 @@ echo -e "${BLUE}Bypass commands available:${NC}"
 echo "  claude  -> claude --dangerously-skip-permissions"
 echo "  gemini  -> gemini --yolo"
 echo "  droid   -> droid exec --skip-permissions-unsafe"
+echo "  glm     -> claude --dangerously-skip-permissions (GLM/ZhipuAI)"
+echo ""
+echo -e "${YELLOW}🆕 claude-all includes 29 bypass flags for all models!${NC}"
 echo ""

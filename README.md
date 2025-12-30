@@ -4,6 +4,10 @@ Dokumentasi dan installer untuk bypass permission prompts pada berbagai AI CLI t
 
 **Supported Platforms:** Termux (Android), Linux Mint, Ubuntu, macOS
 
+**Last Updated:** 2025-12-30 (Added GLM support & 29 bypass flags)
+
+---
+
 ## One-Line Installer
 
 ### Termux (Android)
@@ -25,12 +29,15 @@ curl -fsSL https://raw.githubusercontent.com/zesbe/cli-bypass-docs/main/scripts/
 
 ## Quick Reference
 
-| CLI | Bypass Flag | Alias |
-|-----|-------------|-------|
-| Claude | `--dangerously-skip-permissions` | `claude` |
-| Gemini | `--yolo` atau `--approval-mode yolo` | `gemini` |
-| Droid | `--skip-permissions-unsafe` | `droid` |
-| Letta | - (tidak ada) | - |
+| CLI | Bypass Flag | Alias | Status |
+|-----|-------------|-------|--------|
+| Claude | `--dangerously-skip-permissions` | `claude` | ✅ Updated (29 calls) |
+| Gemini | `--yolo` atau `--approval-mode yolo` | `gemini` | ✅ Active |
+| Droid | `--skip-permissions-unsafe` | `droid` | ✅ Active |
+| GLM/ZhipuAI | `--dangerously-skip-permissions` | `glm` | ✅ New |
+| Letta | - (tidak ada) | - | N/A |
+
+---
 
 ## Aliases yang Di-install
 
@@ -38,7 +45,27 @@ curl -fsSL https://raw.githubusercontent.com/zesbe/cli-bypass-docs/main/scripts/
 alias claude="claude --dangerously-skip-permissions"
 alias gemini="gemini --yolo"
 alias droid="droid exec --skip-permissions-unsafe"
+alias glm="claude --dangerously-skip-permissions"  # For GLM users
 ```
+
+---
+
+## 🆕 What's New (2025-12-30)
+
+### Claude Code Updates
+- **claude-all** now includes **29 bypass flags** across all model calls
+- Added support for **GLM models** (ZhipuAI):
+  - glm-4.7 (Latest flagship 2025)
+  - glm-4.6 (High performance)
+  - glm-4.5-air (Fast & efficient)
+  - glm-4.6v & glm-4.5v (Vision models)
+- All 29 `exec claude` calls now use `--dangerously-skip-permissions`
+
+### Improvements
+- Better model selection UI with numbered menu
+- Removed 10 non-working experimental models
+- Added tested & working models only
+- Cleaner interface with categories (Latest, Vision, etc.)
 
 ---
 
@@ -52,11 +79,20 @@ claude --dangerously-skip-permissions
 
 # Atau dengan alias (setelah install)
 claude
+
+# claude-all multi-model launcher (NEW!)
+claude-all
+# Pilih model 1-29 atau tekan ENTER untuk default
 ```
 
-**claude-all** sudah dimodifikasi dengan 37 `exec claude` menggunakan flag bypass.
+**Features:**
+- ✅ 29 `exec claude` calls with bypass enabled
+- ✅ Multi-model support (Anthropic, OpenAI, Google, xAI, GLM, etc.)
+- ✅ Numbered model selection menu
+- ✅ GLM models integrated (glm-4.7, glm-4.6, glm-4.5-air, vision models)
+- ✅ Auto-bypass on all model selections
 
-Download manual:
+**Download manual:**
 ```bash
 # Termux
 curl -fsSL https://raw.githubusercontent.com/zesbe/cli-bypass-docs/main/scripts/claude-all -o $PREFIX/bin/claude-all
@@ -96,6 +132,25 @@ droid exec --skip-permissions-unsafe "prompt"
 # --skip-permissions-unsafe : FULL BYPASS
 ```
 
+### GLM / ZhipuAI
+
+```bash
+# Via claude-all (recommended)
+claude-all
+# Pilih option 7 (ZhipuAI / GLM)
+# Pilih model 1-5:
+#   1) glm-4.7     (Latest flagship)
+#   2) glm-4.6     (High performance)
+#   3) glm-4.5-air (Fast & efficient)
+#   4) glm-4.6v    (Vision model)
+#   5) glm-4.5v    (Vision model)
+
+# Atau langsung dengan API
+export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+export ANTHROPIC_API_KEY="your-glm-api-key"
+claude --dangerously-skip-permissions --model glm-4.7
+```
+
 ### Letta
 
 Letta tidak punya sistem permission sendiri karena merupakan wrapper/agent manager yang menggunakan model dari provider lain.
@@ -112,6 +167,7 @@ Jika tidak ingin pakai installer otomatis:
 echo 'alias claude="claude --dangerously-skip-permissions"' >> ~/.bashrc
 echo 'alias gemini="gemini --yolo"' >> ~/.bashrc
 echo 'alias droid="droid exec --skip-permissions-unsafe"' >> ~/.bashrc
+echo 'alias glm="claude --dangerously-skip-permissions"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -130,7 +186,7 @@ sudo curl -fsSL https://raw.githubusercontent.com/zesbe/cli-bypass-docs/main/scr
 ## Persistence
 
 Semua konfigurasi persist setelah reboot:
-- `~/.bashrc` - alias untuk claude, gemini, droid
+- `~/.bashrc` - alias untuk claude, gemini, droid, glm
 - `$PREFIX/bin/claude-all` (Termux) atau `/usr/local/bin/claude-all` (Linux)
 
 ---
@@ -140,7 +196,7 @@ Semua konfigurasi persist setelah reboot:
 ```
 scripts/
 ├── install.sh      # One-line installer script
-└── claude-all      # Multi-model launcher with bypass enabled
+└── claude-all      # Multi-model launcher with bypass enabled (29 bypass flags)
 ```
 
 ---
@@ -152,6 +208,7 @@ scripts/
 sed -i '/alias claude=/d' ~/.bashrc
 sed -i '/alias gemini=/d' ~/.bashrc
 sed -i '/alias droid=/d' ~/.bashrc
+sed -i '/alias glm=/d' ~/.bashrc
 
 # Remove claude-all (Termux)
 rm $PREFIX/bin/claude-all
@@ -165,5 +222,42 @@ source ~/.bashrc
 
 ---
 
+## Verification
+
+Cek apakah bypass sudah aktif:
+
+```bash
+# Cek jumlah bypass flags di claude-all
+grep -c "dangerously-skip-permissions" $(which claude-all)
+# Output: 29
+
+# Test claude
+claude --help | grep "dangerously-skip-permissions"
+
+# Test claude-all
+claude-all
+# Pilih model dan lihat apakah permission bypass aktif
+```
+
+---
+
+## Troubleshooting
+
+**Q: Aliases tidak bekerja?**
+A: Pastikan sudah `source ~/.bashrc` atau buka terminal baru.
+
+**Q: claude-all tidak bisa diakses?**
+A: Cek permission dengan `ls -l $(which claude-all)` dan pastikan executable.
+
+**Q: GLM model tidak muncul di claude-all?**
+A: Update ke versi terbaru:
+```bash
+curl -fsSL https://raw.githubusercontent.com/zesbe/cli-bypass-docs/main/scripts/claude-all -o $PREFIX/bin/claude-all
+chmod +x $PREFIX/bin/claude-all
+```
+
+---
+
 *Last updated: 2025-12-30*
+*Repository: https://github.com/zesbe/cli-bypass-docs*
 *Author: zesbe*
